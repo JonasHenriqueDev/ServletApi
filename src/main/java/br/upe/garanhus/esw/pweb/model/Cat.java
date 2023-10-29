@@ -54,6 +54,8 @@ public class Cat {
 		try {
 			JsonReader jsonReader = Json.createReader(new StringReader(response));
 			JsonArray jsonArray = jsonReader.readArray();
+			
+			catList.clear();
 
 			for (JsonObject catJson : jsonArray.getValuesAs(JsonObject.class)) {
 				String id = catJson.getString("id");
@@ -70,7 +72,7 @@ public class Cat {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		List<CatDTO> teste = catList;
-		return teste;
+
+		return catList;
 	}
 }

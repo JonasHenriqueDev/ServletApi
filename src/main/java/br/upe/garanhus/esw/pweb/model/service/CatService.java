@@ -1,6 +1,6 @@
 package br.upe.garanhus.esw.pweb.model.service;
 
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.List;
 
 import br.upe.garanhus.esw.pweb.model.Cat;
@@ -9,39 +9,76 @@ import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
+import jakarta.json.JsonReader;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class CatService {
 
-    private Cat cat;
+	private Cat cat;
+	private List<CatDTO> catList;
+	private JsonArray catJsonArray;
+	private JsonArrayBuilder jsonArrayBuilder;
 
-    public CatService() {
-        cat = new Cat();
-    }
+	public CatService() {
+		cat = new Cat();
+		jsonArrayBuilder = Json.createArrayBuilder();
 
-    public JsonArray getAllCats() {
-        JsonArray jsonArray = null;
-        try {
-            List<CatDTO> catList = cat.parseData(cat.fetchData());
+	}
 
-            JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
+	public JsonArray getAllCats() {
+		catList = cat.parseData(cat.fetchData());
 
-            for (CatDTO catDTO : catList) {
-                jsonArrayBuilder.add(Json.createObjectBuilder()
-                        .add("id", catDTO.getId())
-                        .add("url", catDTO.getUrl())
-                        .add("width", catDTO.getWidth())
-                        .add("height", catDTO.getHeight()));
-            }
+		try {
+			JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
 
-            jsonArray = jsonArrayBuilder.build();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+			for (CatDTO catDTO : catList) {
+				JsonArray catArray = buildCatArray(catDTO);
+				jsonArrayBuilder.add(catArray);
+			}
 
-        return jsonArray;
-    }
+			catJsonArray = jsonArrayBuilder.build();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-    public Cat getCatById(int Id) {
-        return cat;
-    }
+		return catJsonArray;
+	}
+
+	public JsonArray getCatById(String id) {
+		try {
+			for (CatDTO catDTO : catList) {
+				if (catDTO.getId().equals(id)) {
+					JsonArray catArray = buildCatArray(catDTO);
+					jsonArrayBuilder.add(catArray);
+				}
+			}
+
+			catJsonArray = jsonArrayBuilder.build();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return catJsonArray;
+	}
+
+	public String getIdFromRequest(HttpServletRequest request) {
+		JsonReader reader = null;
+		
+		try {
+			reader = Json.createReader(request.getReader());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		JsonObject requestBody = reader.readObject();
+		
+		return requestBody.getString("id");
+	}
+
+	protected JsonArray buildCatArray(CatDTO catDTO) {
+		return Json
+				.createArrayBuilder().add(Json.createObjectBuilder().add("id", catDTO.getId())
+						.add("url", catDTO.getUrl()).add("width", catDTO.getWidth()).add("height", catDTO.getHeight()))
+				.build();
+	}
 }

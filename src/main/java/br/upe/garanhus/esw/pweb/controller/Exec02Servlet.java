@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.util.List;
 
 import br.upe.garanhus.esw.pweb.model.Cat;
+import br.upe.garanhus.esw.pweb.model.DTO.CatDTO;
 import br.upe.garanhus.esw.pweb.model.service.CatService;
 import jakarta.json.JsonArray;
 import jakarta.servlet.ServletException;
@@ -16,14 +17,11 @@ import jakarta.servlet.http.HttpServletResponse;
 /**
  * Servlet implementation class Exec02Servlet
  */
-@WebServlet("/processa-imagem")
+@WebServlet(name = "CatApiServlet", urlPatterns = { "/processa-imagem" })
 public class Exec02Servlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private CatService service;
 
-	/**
-	 * Default constructor.
-	 */
 	public Exec02Servlet() {
 		// TODO Auto-generated constructor stub
 	}
@@ -32,18 +30,21 @@ public class Exec02Servlet extends HttpServlet {
 		service = new CatService();
 	}
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
-	 *      response)
-	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		JsonArray catJsonArray = service.getAllCats();
 
-		// Define o tipo de conteúdo da resposta como JSON
 		response.setContentType("application/json");
 
-		// Escreve o JSON array como resposta
+		JsonArray catJsonArray = service.getAllCats();
+		response.getWriter().write(catJsonArray.toString());
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
+		response.setContentType("application/json");
+
+		JsonArray catJsonArray = service.getCatById(service.getIdFromRequest(request));
 		response.getWriter().write(catJsonArray.toString());
 
 	}
