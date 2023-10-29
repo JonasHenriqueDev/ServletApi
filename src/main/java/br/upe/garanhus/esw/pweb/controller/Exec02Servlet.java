@@ -17,7 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
 /**
  * Servlet implementation class Exec02Servlet
  */
-@WebServlet(name = "CatApiServlet", urlPatterns = { "/processa-imagem" })
+@WebServlet(name = "Exec02Servlet", urlPatterns = { "/processa-imagem" })
 public class Exec02Servlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private CatService service;
