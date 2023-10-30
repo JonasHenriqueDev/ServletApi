@@ -26,7 +26,6 @@ public class CatService {
 
 	public JsonArray getAllCats() {
 	    catList = cat.parseData(cat.fetchData());
-	    jsonArrayBuilder = Json.createArrayBuilder();
 
 	    try {
 	        for (CatDTO catDTO : catList) {
