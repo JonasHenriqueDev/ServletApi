@@ -25,8 +25,7 @@ public class Cat {
 
 	private static List<CatDTO> catList;
 
-	private static final Logger logger = Logger.getLogger(Cat.class.getName()); // Substitua 'Cat' pelo nome da sua
-																				// classe
+	private static final Logger logger = Logger.getLogger(Cat.class.getName());
 
 	public Cat() {
 		Cat.client = HttpClient.newHttpClient();
@@ -40,6 +39,7 @@ public class Cat {
 		try {
 			HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 			if (response.statusCode() == 200) {
+				logger.info("Body da request" + response.body());
 				return response.body();
 			}
 		} catch (IOException | InterruptedException e) {
@@ -54,7 +54,7 @@ public class Cat {
 		try {
 			JsonReader jsonReader = Json.createReader(new StringReader(response));
 			JsonArray jsonArray = jsonReader.readArray();
-			
+
 			catList.clear();
 
 			for (JsonObject catJson : jsonArray.getValuesAs(JsonObject.class)) {
@@ -68,6 +68,7 @@ public class Cat {
 			}
 
 			logger.info("Tamanho da lista catList: " + catList.size());
+			logger.info("Lista catList: " + catList.toString());
 
 		} catch (Exception e) {
 			e.printStackTrace();

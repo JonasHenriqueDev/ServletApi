@@ -6,7 +6,9 @@ public class CatDTO {
 	private String url;
 	private int width;
 	private int height;
-
+	
+	public CatDTO() {}
+	
 	public CatDTO(String id, String url, int width, int height) {
 		super();
 		this.id = id;

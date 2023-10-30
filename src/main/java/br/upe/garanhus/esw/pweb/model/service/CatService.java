@@ -22,33 +22,32 @@ public class CatService {
 	public CatService() {
 		cat = new Cat();
 		jsonArrayBuilder = Json.createArrayBuilder();
-
 	}
 
 	public JsonArray getAllCats() {
-		catList = cat.parseData(cat.fetchData());
+	    catList = cat.parseData(cat.fetchData());
+	    jsonArrayBuilder = Json.createArrayBuilder(); // Crie um novo JsonArrayBuilder
 
-		try {
-			JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
+	    try {
+	        for (CatDTO catDTO : catList) {
+	            JsonObject catObject = buildCatObject(catDTO); // Crie um objeto JSON para cada CatDTO
+	            jsonArrayBuilder.add(catObject);
+	        }
 
-			for (CatDTO catDTO : catList) {
-				JsonArray catArray = buildCatArray(catDTO);
-				jsonArrayBuilder.add(catArray);
-			}
+	        catJsonArray = jsonArrayBuilder.build();
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
 
-			catJsonArray = jsonArrayBuilder.build();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return catJsonArray;
+	    return catJsonArray;
 	}
 
 	public JsonArray getCatById(String id) {
+		
 		try {
 			for (CatDTO catDTO : catList) {
 				if (catDTO.getId().equals(id)) {
-					JsonArray catArray = buildCatArray(catDTO);
+					JsonObject catArray = buildCatObject(catDTO);
 					jsonArrayBuilder.add(catArray);
 				}
 			}
@@ -75,10 +74,12 @@ public class CatService {
 		return requestBody.getString("id");
 	}
 
-	protected JsonArray buildCatArray(CatDTO catDTO) {
-		return Json
-				.createArrayBuilder().add(Json.createObjectBuilder().add("id", catDTO.getId())
-						.add("url", catDTO.getUrl()).add("width", catDTO.getWidth()).add("height", catDTO.getHeight()))
-				.build();
+	protected JsonObject buildCatObject(CatDTO catDTO) {
+	    return Json.createObjectBuilder()
+	            .add("id", catDTO.getId())
+	            .add("url", catDTO.getUrl())
+	            .add("width", catDTO.getWidth())
+	            .add("height", catDTO.getHeight())
+	            .build();
 	}
 }

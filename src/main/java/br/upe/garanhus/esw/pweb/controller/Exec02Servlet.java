@@ -35,8 +35,8 @@ public class Exec02Servlet extends HttpServlet {
 
 		response.setContentType("application/json");
 
-		JsonArray catJsonArray = service.getAllCats();
-		response.getWriter().write(catJsonArray.toString());
+//		JsonArray catJsonArray = service.getAllCats();
+		response.getWriter().write(service.getAllCats().toString());
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
