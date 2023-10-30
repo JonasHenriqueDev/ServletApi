@@ -26,11 +26,11 @@ public class CatService {
 
 	public JsonArray getAllCats() {
 	    catList = cat.parseData(cat.fetchData());
-	    jsonArrayBuilder = Json.createArrayBuilder(); // Crie um novo JsonArrayBuilder
+	    jsonArrayBuilder = Json.createArrayBuilder();
 
 	    try {
 	        for (CatDTO catDTO : catList) {
-	            JsonObject catObject = buildCatObject(catDTO); // Crie um objeto JSON para cada CatDTO
+	            JsonObject catObject = buildCatObject(catDTO);
 	            jsonArrayBuilder.add(catObject);
 	        }
 
