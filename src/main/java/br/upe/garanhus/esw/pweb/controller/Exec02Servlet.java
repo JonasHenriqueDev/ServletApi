@@ -1,12 +1,11 @@
 package br.upe.garanhus.esw.pweb.controller;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.List;
 
-import br.upe.garanhus.esw.pweb.model.Cat;
-import br.upe.garanhus.esw.pweb.model.DTO.CatDTO;
+import br.upe.garanhus.esw.pweb.model.AplicacaoException;
+import br.upe.garanhus.esw.pweb.model.DTO.ErrorDTO;
 import br.upe.garanhus.esw.pweb.model.service.CatService;
+import br.upe.garanhus.esw.pweb.model.service.ErrorService;
 import jakarta.json.JsonArray;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -32,21 +31,31 @@ public class Exec02Servlet extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-
 		response.setContentType("application/json");
 
-//		JsonArray catJsonArray = service.getAllCats();
-		response.getWriter().write(service.getAllCats().toString());
+		try {
+			JsonArray catJsonArray = service.getAllCats();
+			response.getWriter().write(catJsonArray.toString());
+		} catch (AplicacaoException e) {
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			ErrorDTO errorResponse = new ErrorDTO(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Erro na solicitação",
+					e.getMessage());
+			response.getWriter().write(ErrorService.toJson(errorResponse).toString());
+		}
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
 		response.setContentType("application/json");
-
-		JsonArray catJsonArray = service.getCatById(service.getIdFromRequest(request));
-		response.getWriter().write(catJsonArray.toString());
-
+		try {
+			JsonArray catJsonArray = service.getCatById(service.getIdFromRequest(request));
+			response.getWriter().write(catJsonArray.toString());
+		} catch (AplicacaoException e) {
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			ErrorDTO errorResponse = new ErrorDTO(HttpServletResponse.SC_NOT_FOUND, "Não encontrado",
+					e.getMessage());
+			response.getWriter().write(ErrorService.toJson(errorResponse).toString());
+		}
 	}
-
 }

@@ -3,6 +3,7 @@ package br.upe.garanhus.esw.pweb.model.service;
 import java.io.IOException;
 import java.util.List;
 
+import br.upe.garanhus.esw.pweb.model.AplicacaoException;
 import br.upe.garanhus.esw.pweb.model.Cat;
 import br.upe.garanhus.esw.pweb.model.DTO.CatDTO;
 import jakarta.json.Json;
@@ -25,24 +26,25 @@ public class CatService {
 	}
 
 	public JsonArray getAllCats() {
-	    catList = cat.parseData(cat.fetchData());
+		catList = cat.parseData(cat.fetchData());
 
-	    try {
-	        for (CatDTO catDTO : catList) {
-	            JsonObject catObject = buildCatObject(catDTO);
-	            jsonArrayBuilder.add(catObject);
-	        }
+		try {
+			for (CatDTO catDTO : catList) {
+				JsonObject catObject = buildCatObject(catDTO);
+				jsonArrayBuilder.add(catObject);
+			}
 
-	        catJsonArray = jsonArrayBuilder.build();
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
+			catJsonArray = jsonArrayBuilder.build();
+		} catch (Exception e) {
+			throw new AplicacaoException("Erro ao recuperar todos os gatos", e);
+		}
 
-	    return catJsonArray;
+		return catJsonArray;
 	}
 
 	public JsonArray getCatById(String id) {
-		
+		boolean gatoEncontrado = false;
+
 		try {
 			for (CatDTO catDTO : catList) {
 				if (catDTO.getId().equals(id)) {
@@ -52,8 +54,9 @@ public class CatService {
 			}
 
 			catJsonArray = jsonArrayBuilder.build();
+
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new AplicacaoException("Nenhum gato econtrado para o id: " + id, e);
 		}
 
 		return catJsonArray;
@@ -61,24 +64,20 @@ public class CatService {
 
 	public String getIdFromRequest(HttpServletRequest request) {
 		JsonReader reader = null;
-		
+
 		try {
 			reader = Json.createReader(request.getReader());
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new AplicacaoException("Erro ao ler ID do corpo da solicitação.", e);
 		}
-		
+
 		JsonObject requestBody = reader.readObject();
-		
+
 		return requestBody.getString("id");
 	}
 
 	protected JsonObject buildCatObject(CatDTO catDTO) {
-	    return Json.createObjectBuilder()
-	            .add("id", catDTO.getId())
-	            .add("url", catDTO.getUrl())
-	            .add("width", catDTO.getWidth())
-	            .add("height", catDTO.getHeight())
-	            .build();
+		return Json.createObjectBuilder().add("id", catDTO.getId()).add("url", catDTO.getUrl())
+				.add("width", catDTO.getWidth()).add("height", catDTO.getHeight()).build();
 	}
 }

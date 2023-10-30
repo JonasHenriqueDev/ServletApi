@@ -41,12 +41,12 @@ public class Cat {
 			if (response.statusCode() == 200) {
 				logger.info("Body da request" + response.body());
 				return response.body();
+			} else {
+				throw new AplicacaoException("Erro na requisição.");
 			}
 		} catch (IOException | InterruptedException e) {
-			e.printStackTrace();
+			throw new AplicacaoException("Erro ao buscar dados de gatos.", e);
 		}
-
-		return null;
 	}
 
 	public List<CatDTO> parseData(String response) {
@@ -71,7 +71,7 @@ public class Cat {
 			logger.info("Lista catList: " + catList.toString());
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new AplicacaoException("Erro ao analisar os dados dos gatos.", e);
 		}
 
 		return catList;
