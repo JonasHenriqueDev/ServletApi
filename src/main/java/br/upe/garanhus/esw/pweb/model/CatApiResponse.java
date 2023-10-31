@@ -43,11 +43,11 @@ public class CatApiResponse {
         logger.info(LOG_REQUEST_BODY + response.body());
         return response.body();
       } else {
-        logger.info(ERROR_REQUEST);
+        logger.severe(ERROR_REQUEST);
         throw new AplicacaoException(ERROR_REQUEST, new AplicacaoException(), response.statusCode());
       }
     } catch (IOException | InterruptedException e) {
-      logger.info(ERROR_REQUEST);
+      logger.severe(ERROR_REQUEST);
       throw new AplicacaoException(ERROR_FETCH_DATA, e, 502);
     }
   }
@@ -69,7 +69,7 @@ public class CatApiResponse {
         catList.add(catDTO);
       }
     } catch (jakarta.json.JsonException e) {
-      logger.info(ERROR_PARSE_DATA);
+      logger.severe(ERROR_PARSE_DATA);
       throw new AplicacaoException(ERROR_PARSE_DATA, e, 500);
     }
 

@@ -27,7 +27,8 @@ public class Exec02Servlet extends HttpServlet {
       throws ServletException, IOException {
 
     response.setContentType("application/json");
-    ErrorService.handleRequest(request, response, () -> service.getAllCats());
+    ErrorService.handleRequest(request, response, 
+        () -> service.getAllCats());
   }
 
   protected void doPost(HttpServletRequest request, HttpServletResponse response)

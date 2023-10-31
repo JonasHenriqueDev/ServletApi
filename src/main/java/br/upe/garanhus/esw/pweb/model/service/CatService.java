@@ -22,7 +22,7 @@ public class CatService {
   private JsonArrayBuilder jsonArrayBuilder;
   private static final Logger logger = Logger.getLogger(CatService.class.getName());
 
-  private static final String ERROR_FETCH_CATS = "Erro ao recuperar todos os dados";
+  private static final String ERROR_FETCH_CATS = "Erro ao recuperar todos os dados.";
   private static final String ERROR_NO_CAT_FOUND = "Nenhum dado encontrado para o ID: ";
   private static final String ERROR_READ_REQUEST_BODY = "Erro ao ler ID do corpo da solicitação.";
   private static final String ERROR_REQUIRE_GET_REQUEST = "Antes de chamar este método, certifique-se de realizar uma solicitação GET para /atividade-exec02/processa-imagem";
@@ -50,7 +50,7 @@ public class CatService {
       catJsonArray = jsonArrayBuilder.build();
       logger.info(LOG_BUILD_JSON_OBJECT);
     } catch (AplicacaoException e) {
-      logger.info(ERROR_FETCH_CATS);
+      logger.severe(ERROR_FETCH_CATS);
       throw new AplicacaoException(ERROR_FETCH_CATS, e, 502);
     }
 
@@ -62,6 +62,7 @@ public class CatService {
 
     try {
       if (catList == null) {
+        logger.severe(ERROR_REQUIRE_GET_REQUEST);
         throw new AplicacaoException(ERROR_REQUIRE_GET_REQUEST, new AplicacaoException(), 400);
       }
       
@@ -76,16 +77,16 @@ public class CatService {
       }
 
       if (!catFound) {
-        logger.info(ERROR_NO_CAT_FOUND + id);
+        logger.severe(ERROR_NO_CAT_FOUND + id);
         throw new NoCatFoundException(ERROR_NO_CAT_FOUND + id, new NoCatFoundException(), 404);
       }
       
       catJsonArray = jsonArrayBuilder.build();
     } catch (NoCatFoundException e) {
-      logger.info(ERROR_NO_CAT_FOUND + id);
+      logger.severe(ERROR_NO_CAT_FOUND + id);
       throw new NoCatFoundException(ERROR_NO_CAT_FOUND + id, e, 404);
     } catch (AplicacaoException e) {
-      logger.info(ERROR_NO_CAT_FOUND + id);
+      logger.severe(ERROR_NO_CAT_FOUND + id);
       throw new NoCatFoundException(ERROR_NO_CAT_FOUND + id, e, 400);
     }
 
@@ -99,7 +100,7 @@ public class CatService {
       JsonObject requestBody = reader.readObject();
       return requestBody.getString("id");
     } catch (IOException e) {
-      logger.info(ERROR_READ_REQUEST_BODY);
+      logger.severe(ERROR_READ_REQUEST_BODY);
       throw new AplicacaoException(ERROR_READ_REQUEST_BODY, e, 400);
     }
   }
