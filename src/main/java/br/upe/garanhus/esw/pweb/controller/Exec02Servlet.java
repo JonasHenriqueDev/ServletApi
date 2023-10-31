@@ -17,9 +17,7 @@ public class Exec02Servlet extends HttpServlet {
   private static final long serialVersionUID = 1L;
   private CatService service;
 
-  public Exec02Servlet() {
-    // TODO Auto-generated constructor stub
-  }
+  public Exec02Servlet() {}
 
   public void init() {
     service = new CatService();
@@ -34,7 +32,6 @@ public class Exec02Servlet extends HttpServlet {
 
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
-
     response.setContentType("application/json");
     ErrorService.handleRequest(request, response,
         () -> service.getCatById(service.getIdFromRequest(request)));

@@ -25,6 +25,10 @@ public class CatApiResponse {
   private static final String ERROR_REQUEST = "Erro na requisição HTTP.";
   private static final String ERROR_FETCH_DATA = "Ocorreu um erro ao buscar os dados da API.";
   private static final String ERROR_PARSE_DATA = "Erro ao analisar os dados dos gatos.";
+  
+  private static final String LOG_FETCH_DATA = "Buscando dados da API.";
+  private static final String LOG_REQUEST_BODY = "Body da request: ";
+  private static final String LOG_ANALYZE_DATA = "Analisando dados recebidos da API.";
 
   public CatApiResponse() {
     client = HttpClient.newHttpClient();
@@ -33,22 +37,26 @@ public class CatApiResponse {
 
   public String fetchData() {
     try {
+      logger.info(LOG_FETCH_DATA);
       HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
       if (response.statusCode() == 200) {
-        logger.info("Body da request: " + response.body());
+        logger.info(LOG_REQUEST_BODY + response.body());
         return response.body();
       } else {
-        throw new AplicacaoException(ERROR_REQUEST + response.statusCode());
+        logger.info(ERROR_REQUEST);
+        throw new AplicacaoException(ERROR_REQUEST, new AplicacaoException(), response.statusCode());
       }
     } catch (IOException | InterruptedException e) {
-      throw new AplicacaoException(ERROR_FETCH_DATA, e);
+      logger.info(ERROR_REQUEST);
+      throw new AplicacaoException(ERROR_FETCH_DATA, e, 502);
     }
   }
 
   public List<CatDTO> parseData(String response) {
     List<CatDTO> catList = new ArrayList<>();
-
+    
     try {
+      logger.info(LOG_ANALYZE_DATA);
       JsonReader jsonReader = Json.createReader(new StringReader(response));
       JsonArray jsonArray = jsonReader.readArray();
 
@@ -60,11 +68,9 @@ public class CatApiResponse {
         CatDTO catDTO = new CatDTO(id, url, width, height);
         catList.add(catDTO);
       }
-
-      logger.info("Tamanho da lista catList: " + catList.size());
-      logger.info("Lista catList: " + catList.toString());
     } catch (jakarta.json.JsonException e) {
-      throw new AplicacaoException(ERROR_PARSE_DATA, e);
+      logger.info(ERROR_PARSE_DATA);
+      throw new AplicacaoException(ERROR_PARSE_DATA, e, 500);
     }
 
     return catList;

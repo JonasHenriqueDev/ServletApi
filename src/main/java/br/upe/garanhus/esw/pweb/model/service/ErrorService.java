@@ -12,36 +12,42 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 public class ErrorService {
+  
+  private static String detalhe;
+  private static int httpStatusCode;
+  private static ErrorDTO errorResponse;
+  private static JsonObject errorJson;
+  private static JsonArray catJsonArray;
 
-  public ErrorService() {
-    // TODO Auto-generated constructor stub
-  }
+  public ErrorService() {}
 
   public static JsonObject toJson(ErrorDTO errorDTO) {
-    JsonObjectBuilder builder = Json.createObjectBuilder().add("codigo", errorDTO.getCodigo())
-        .add("mensagem", errorDTO.getMensagem()).add("detalhe", errorDTO.getDetalhe());
-
-    System.out.println("DETALHEEEEEEEEEEEEEEEEEEEE  " + errorDTO.getDetalhe());
-
+    JsonObjectBuilder builder = Json.createObjectBuilder()
+        .add("codigo", errorDTO.getCodigo())
+        .add("mensagem", errorDTO.getMensagem())
+        .add("detalhe", errorDTO.getDetalhe());
+    
     return builder.build();
   }
 
   public static void handleErrorResponse(HttpServletResponse response, AplicacaoException e)
       throws IOException {
 
-    int httpStatusCode = determineHttpStatusCode(e);
-
+    httpStatusCode = determineHttpStatusCode(e);
+    detalhe = e.getCause().toString();
 
     response.setStatus(httpStatusCode);
-    ErrorDTO errorResponse = new ErrorDTO(httpStatusCode, e.getMessage(), e.getCause().toString());
-    JsonObject errorJson = ErrorService.toJson(errorResponse);
+    
+    errorResponse = new ErrorDTO(httpStatusCode, e.getMessage(), detalhe);
+    errorJson = ErrorService.toJson(errorResponse);
+    
     response.getWriter().write(errorJson.toString());
   }
 
   public static void handleRequest(HttpServletRequest request, HttpServletResponse response,
       Supplier<JsonArray> action) throws IOException {
     try {
-      JsonArray catJsonArray = action.get();
+      catJsonArray = action.get();
       response.getWriter().write(catJsonArray.toString());
     } catch (AplicacaoException e) {
       handleErrorResponse(response, e);
@@ -49,10 +55,9 @@ public class ErrorService {
   }
 
   private static Integer determineHttpStatusCode(AplicacaoException e) {
-    if (e.getHttpStatusCode() != null) {
+    if (e.getHttpStatusCode() != null)
       return e.getHttpStatusCode();
-    } else {
-      return HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-    }
+
+    return HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
   }
 }
